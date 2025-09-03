@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.8/dist/purify.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            width: 600px;
+            height: 80vh;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #chat-history {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #f1f0f0;
+            align-self: flex-start;
+        }
+        #input-area {
+            display: flex;
+            padding: 20px;
+        }
+        #question-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button:disabled {
+            background-color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-history"></div>
+    <div id="input-area">
+        <input type="text" id="question-input" placeholder="Type your question...">
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+    const questionInput = document.getElementById('question-input');
+    const sendButton = document.getElementById('send-button');
+    const chatHistory = document.getElementById('chat-history');
+
+    // Generate a unique session ID for this chat session
+    const sessionId = 'session_' + Date.now() + Math.random().toString(36).substr(2, 9);
+
+    sendButton.addEventListener('click', sendMessage);
+    questionInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    async function sendMessage() {
+        const question = questionInput.value.trim();
+        if (!question) return;
+
+        appendMessage(question, 'user-message');
+        questionInput.value = '';
+        sendButton.disabled = true;
+
+        try {
+            const response = await fetch('http://lllsh.natapp1.cc/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: question,
+                    session_id: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let botMessageElement = appendMessage('', 'bot-message');
+            let buffer = '';
+            let botResponseText = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    break;
+                }
+                
+                buffer += decoder.decode(value, { stream: true });
+                
+                const parts = buffer.split('\n\n');
+                
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const part = parts[i];
+                    if (part.startsWith('data: ')) {
+                        const data = part.substring(6);
+                        if (data === '[DONE]') {
+                            continue;
+                        }
+                        botResponseText += data;
+                        // Use DOMPurify to sanitize the HTML output from marked.js
+                        // This prevents flickering by ensuring only valid HTML is rendered.
+                        const cleanHtml = DOMPurify.sanitize(marked.parse(botResponseText));
+                        botMessageElement.innerHTML = cleanHtml;
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    }
+                }
+                buffer = parts[parts.length - 1];
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            appendMessage('Sorry, something went wrong.', 'bot-message');
+        } finally {
+            sendButton.disabled = false;
+            questionInput.focus();
+        }
+    }
+
+    function appendMessage(text, className) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', className);
+        if (className === 'user-message') {
+            messageElement.textContent = text;
+        } else {
+            messageElement.innerHTML = text; // For bot messages, we'll render HTML
+        }
+        chatHistory.appendChild(messageElement);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return messageElement;
+    }
+
+</script>
+
+</body>
+</html>

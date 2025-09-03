@@ -1,0 +1,38 @@
+api:
+  embedding_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW" # ZhipuAI API key
+
+model_name: "model_zhipu"
+
+model_v3:
+  name: "gpt-3.5-turbo"
+  temperature: 0.7
+  api_key: "sk-5rmBFi4DqWDoaKzz936d1bA9540f42E8967683609f5010D1"
+  base_url: "https://api.gpt.ge/v1/"
+
+model_zhipu:
+  name: "glm-4-plus"
+  temperature: 0.7
+  api_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW"
+  base_url: "https://open.bigmodel.cn/api/paas/v4/"
+
+# file_path: "snow sword.pdf"
+file_path: "goods.pdf"
+
+system_prompt: |
+  你是智能电商平台的专业客服助手'小智'。
+  请结合下方提供的商品和活动描述内容，用亲切、耐心、专业的客服语气，以第一人称身份回答用户的问题，回复要简洁高效。
+  如果资料中没有直接答案，也请根据提供的信息做出合理推测，但不要编造与原文无关的信息。
+  请始终以小智客服的身份与用户对话。
+
+  【商品与活动资料】
+  {context}
+  【用户提问】
+  {input}
+  【小智客服回答】
+
+trimmer:
+  max_tokens: 50000
+  strategy: "last"
+  include_system: true
+  allow_partial: false
+  start_on: "human"

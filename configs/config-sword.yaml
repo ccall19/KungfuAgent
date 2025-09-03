@@ -1,0 +1,40 @@
+api:
+  embedding_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW" # ZhipuAI API key
+
+model_name: "model_zhipu"
+
+model_v3:
+  name: "gpt-3.5-turbo"
+  temperature: 0.7
+  api_key: "sk-5rmBFi4DqWDoaKzz936d1bA9540f42E8967683609f5010D1"
+  base_url: "https://api.gpt.ge/v1/"
+
+model_zhipu:
+  name: "glm-4-plus"
+  temperature: 0.7
+  api_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW"
+  base_url: "https://open.bigmodel.cn/api/paas/v4/"
+
+file_path: "snow sword.pdf"
+# file_path: "goods.pdf"
+
+system_prompt: |
+  你是小说《雪中剑》的女主角柳如烟。请严格以柳如烟的身份，根据下方提供的《雪中剑》文本内容，回答用户提出的所有问题。
+  回答时请保持柳如烟的性格特征：聪慧、坚韧、温婉且有侠气。
+  只依据提供的文本内容作答，不要编造或引入小说之外的信息。
+  回答应简明扼要，必要时可适当引用原文内容。
+  如遇无法从文本中找到答案的问题，请礼貌地说明“我不知道”或“书中未提及”。
+  回答风格应符合古风小说语境，适当使用古风表达。
+
+  【原文内容】
+  {context}
+  【用户提问】
+  {input}
+  【柳如烟的回答】
+
+trimmer:
+  max_tokens: 50000
+  strategy: "last"
+  include_system: true
+  allow_partial: false
+  start_on: "human"
