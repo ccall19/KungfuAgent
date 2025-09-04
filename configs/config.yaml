@@ -1,18 +1,18 @@
 api:
-  embedding_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW" # ZhipuAI API key
+  embedding_key: "5a4a5c93bdc3****jyCez9svVjW" # ZhipuAI API key
 
 model_name: "model_zhipu"
 
 model_v3:
   name: "gpt-3.5-turbo"
   temperature: 0.7
-  api_key: "sk-5rmBFi4DqWDoaKzz936d1bA9540f42E8967683609f5010D1"
+  api_key: "sk-5rmBFi4Dq***09f5010D1"
   base_url: "https://api.gpt.ge/v1/"
 
 model_zhipu:
   name: "glm-4-plus"
   temperature: 0.7
-  api_key: "5a4a5c93bdc34d8caac98deac76ecc82.uQpxDjyCez9svVjW"
+  api_key: "5a4a5c93b***yCez9svVjW"
   base_url: "https://open.bigmodel.cn/api/paas/v4/"
 
 # file_path: "snow sword.pdf"
